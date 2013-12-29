@@ -1,24 +1,62 @@
 import std.stdio;
 import std.math;
 import std.string;
-import std.conv;
+import std.conv : to;
+import std.array : split;
 
 void main(string[] args) {
     double dt = to!double(args[1]);
     int numsteps = to!int(args[2]);
 
+    string inp;
+    readf("%s", &inp);
+    auto bods = parseInput(inp); 
+
+    /*
     auto a = Body(25_850_000_000_000, Vector2(-5, 0), Vector2(-1, 0));
     auto b = Body(20_450_000_000_000, Vector2(5, 0), Vector2(1, 0));
     auto bods = [a, b];
-    writeln(bods[0]);
-    writeln(bods[1]);
+    */
+    foreach(bod; bods) { writeln(bod); }
     writeln("---");
+
     foreach(i; 0 .. numsteps) {
         evolve(bods, dt);
-        writeln(bods[0]);
-        writeln(bods[1]);
+
+        foreach(bod; bods) { writeln(bod); }
         writeln("---");
     }
+}
+
+double[] parseLine(string line) {
+    double[] x;
+    foreach(num; split(line)) {
+        x ~= to!double(num);
+    }
+    return x;
+}
+
+unittest {
+   string aline = " 1.4960e+11  0.0000e+00  0.0000e+00  2.9800e+04  5.9740e+24";
+   writeln(parseLine(aline));
+ 
+}
+
+Body[] parseInput(string inp) {
+    auto lines = splitLines(inp);
+    auto len = to!int(lines[0]);
+
+
+    Body[] bods = new Body[len];
+    foreach(i, ref bod; bods) {
+        auto x = parseLine(lines[i+1]);
+        bod = Body(x[4], 
+                   Vector2(x[0], x[1]), 
+                   Vector2(x[2], x[3]));
+    }
+
+    return bods;
+
 }
 
 struct Body {
